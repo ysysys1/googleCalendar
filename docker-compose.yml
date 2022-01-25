@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev-step
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/go/src/github.com/calendar-open/
+    ports:
+      - 3002:8080
