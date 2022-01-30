@@ -6,12 +6,18 @@ import (
 	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
-	"github.com/calendar-open/hello"
+	"github.com/calendar-open/outbounds"
+	"github.com/calendar-open/usecase"
+	"github.com/calendar-open/web_controller"
 )
 
 func main() {
+	calendarClient := outbounds.NewCalendarClient()
+	usecase := usecase.NewCalendarBatchUsecase(calendarClient)
+	controller := web_controller.NewOpenReservationFrameWebController(usecase)
+
 	ctx := context.Background()
-	if err := funcframework.RegisterHTTPFunctionContext(ctx, "/", hello.HelloWorld); err != nil {
+	if err := funcframework.RegisterHTTPFunctionContext(ctx, "/", controller.OpenReservationFrame); err != nil {
 		log.Fatalf("funcframework.RegisterHTTPFunctionContext: %v\n", err)
 	}
 	// Use PORT environment variable, or default to 8080.
