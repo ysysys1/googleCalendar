@@ -25,12 +25,14 @@ func NewOpenReservationFrameWebController(usecase usecase.CalendarBatchUsecase) 
 func (c *openReservationFrameController) OpenReservationFrame(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
 	err := c.usecase.OpenReservationFrame()
 
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Internal error : %v", err), http.StatusInternalServerError)
+		return
 	}
 
 	res := struct {
@@ -42,6 +44,7 @@ func (c *openReservationFrameController) OpenReservationFrame(w http.ResponseWri
 	jsonRes, err := json.Marshal(res)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Internal error : %v", err), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
