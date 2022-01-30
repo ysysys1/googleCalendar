@@ -10,5 +10,9 @@ services:
     stdin_open: true
     volumes:
       - ./:/go/src/github.com/calendar-open/
+    environment:
+      - GOOGLE_CALENDAR_ID
+      - GOOGLE_API_CREDENTIAL
+      - ADMIN_TOKEN
     ports:
       - 3002:8080
