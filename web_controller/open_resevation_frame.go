@@ -3,6 +3,7 @@ package web_controller
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/calendar-open/usecase"
@@ -22,14 +23,38 @@ func NewOpenReservationFrameWebController(usecase usecase.CalendarBatchUsecase) 
 	}
 }
 
+type openReservationFrameInput struct {
+	SearchQuery   string `json:"search_query"`
+	UpdateSummary string `json:"update_summary"`
+}
+
 func (c *openReservationFrameController) OpenReservationFrame(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	err := c.usecase.OpenReservationFrame()
+	input := &openReservationFrameInput{}
 
+	b, err := io.ReadAll(r.Body)
+
+	// TODO: HTTP internal error response
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Internal error : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(b, input)
+
+	// TODO: HTTP internal error response
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Internal error : %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	err = c.usecase.OpenReservationFrame(input.SearchQuery, input.UpdateSummary)
+
+	// TODO: HTTP internal error response
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Internal error : %v", err), http.StatusInternalServerError)
 		return
