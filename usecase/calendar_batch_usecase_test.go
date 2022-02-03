@@ -13,9 +13,15 @@ func TestOpenCalendarUsecase_OpenReservationFrame(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	type args struct {
+		searchQuery   string
+		updateSummary string
+	}
+
 	tests := []struct {
 		name    string
 		mockFn  func(*mock_outbounds.MockCalendarClient)
+		args    args
 		wantErr bool
 	}{
 		{
@@ -31,6 +37,10 @@ func TestOpenCalendarUsecase_OpenReservationFrame(t *testing.T) {
 				}
 				mcc.EXPECT().SearchEvents(gomock.Any()).Return(events, nil)
 				mcc.EXPECT().UpdateEventSummary(gomock.Any(), gomock.Any()).Return(nil, nil)
+			},
+			args: args{
+				searchQuery:   "test",
+				updateSummary: "dummy",
 			},
 			wantErr: false,
 		},
@@ -49,7 +59,7 @@ func TestOpenCalendarUsecase_OpenReservationFrame(t *testing.T) {
 			u := &calendarBatchUsecase{
 				CalendarClient: m,
 			}
-			if err := u.OpenReservationFrame(); (err != nil) != tt.wantErr {
+			if err := u.OpenReservationFrame(tt.args.searchQuery, tt.args.updateSummary); (err != nil) != tt.wantErr {
 				t.Errorf("OpenCalendarUsecase.OpenReservationFrame() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
