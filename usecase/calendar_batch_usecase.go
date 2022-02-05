@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/calendar-open/environments"
 	"github.com/calendar-open/outbounds"
 )
 
@@ -13,15 +15,21 @@ type CalendarBatchUsecase interface {
 
 type calendarBatchUsecase struct {
 	CalendarClient outbounds.CalendarClient
+	Env            environments.Environments
 }
 
-func NewCalendarBatchUsecase(client outbounds.CalendarClient) CalendarBatchUsecase {
+func NewCalendarBatchUsecase(client outbounds.CalendarClient, env environments.Environments) CalendarBatchUsecase {
 	return &calendarBatchUsecase{
 		CalendarClient: client,
+		Env:            env,
 	}
 }
 
 func (u *calendarBatchUsecase) OpenReservationFrame(searchQuery string, updateSummary string) error {
+	if valid := u.isValidateSearchQuery(searchQuery); !valid {
+		return fmt.Errorf("invalid Update Query :%s", searchQuery)
+	}
+
 	events, err := u.CalendarClient.SearchEvents(searchQuery)
 
 	if err != nil {
@@ -39,4 +47,15 @@ func (u *calendarBatchUsecase) OpenReservationFrame(searchQuery string, updateSu
 	}
 
 	return nil
+}
+
+func (u *calendarBatchUsecase) isValidateSearchQuery(searchQuery string) bool {
+	words := u.Env.GetInvalidWordsSearchQueryString()
+
+	for _, word := range words {
+		if word == searchQuery {
+			return false
+		}
+	}
+	return true
 }
