@@ -14,5 +14,7 @@ services:
       - GOOGLE_CALENDAR_ID
       - GOOGLE_API_CREDENTIAL
       - ADMIN_TOKEN
+      - INVALID_SEARCH_QUERY_STRINGS
     ports:
       - 3002:8080
+    command: go run cmd/main.go

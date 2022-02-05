@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
+	"github.com/calendar-open/environments"
 	"github.com/calendar-open/outbounds"
 	"github.com/calendar-open/usecase"
 	"github.com/calendar-open/web_controller"
@@ -13,7 +14,8 @@ import (
 
 func main() {
 	calendarClient := outbounds.NewCalendarClient()
-	usecase := usecase.NewCalendarBatchUsecase(calendarClient)
+	envs := environments.NewEnvironments()
+	usecase := usecase.NewCalendarBatchUsecase(calendarClient, envs)
 	controller := web_controller.NewOpenReservationFrameWebController(usecase)
 
 	ctx := context.Background()
