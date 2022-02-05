@@ -8,7 +8,7 @@ import (
 )
 
 type CalendarBatchUsecase interface {
-	OpenReservationFrame() error
+	OpenReservationFrame(searchQuery string, updateSummary string) error
 }
 
 type calendarBatchUsecase struct {
@@ -21,8 +21,8 @@ func NewCalendarBatchUsecase(client outbounds.CalendarClient) CalendarBatchUseca
 	}
 }
 
-func (u *calendarBatchUsecase) OpenReservationFrame() error {
-	events, err := u.CalendarClient.SearchEvents("準備枠")
+func (u *calendarBatchUsecase) OpenReservationFrame(searchQuery string, updateSummary string) error {
+	events, err := u.CalendarClient.SearchEvents(searchQuery)
 
 	if err != nil {
 		log.Printf("Unable to fetch events: %v", err)
@@ -31,7 +31,7 @@ func (u *calendarBatchUsecase) OpenReservationFrame() error {
 
 	for _, event := range events.Items {
 		time.Sleep(time.Second * 1)
-		_, err := u.CalendarClient.UpdateEventSummary(event, "予約枠")
+		_, err := u.CalendarClient.UpdateEventSummary(event, updateSummary)
 
 		if err != nil {
 			return err
